@@ -6,10 +6,7 @@ import com.Oil4Med.Oil4Med.DTO.FarmerDTO;
 import com.Oil4Med.Oil4Med.DTO.MillFactoryDTO;
 import com.Oil4Med.Oil4Med.Model.*;
 import com.Oil4Med.Oil4Med.Model.Types.OilTraceability;
-import com.Oil4Med.Oil4Med.Service.AdminService;
-import com.Oil4Med.Oil4Med.Service.ConsumerService;
-import com.Oil4Med.Oil4Med.Service.FarmerService;
-import com.Oil4Med.Oil4Med.Service.MillFactoryService;
+import com.Oil4Med.Oil4Med.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +24,10 @@ public class AdminController {
     private ConsumerService consumerService;
     @Autowired
     private FarmerService farmerService;
-
     @Autowired
     private MillFactoryService millFactoryService;
+    @Autowired
+    MillManagerService millManagerService ;
 
     //CRUD Admin
     @PostMapping("/createAdmin")
@@ -64,7 +62,7 @@ public class AdminController {
         List<Consumer> newConsumerList = adminService.getAdminById(adminId).getConsumers();
         newConsumerList.add(consumer);
         adminService.getAdminById(adminId).setConsumers(newConsumerList);
-        updateAdmin(adminId,adminService.getAdminById(adminId));
+        //updateAdmin(adminId,adminService.getAdminById(adminId));
         consumer.setAdminCreatedConsumer(adminService.getAdminById(adminId));
         return consumerService.addConsumer(consumer);
     }
@@ -95,7 +93,9 @@ public class AdminController {
     public Farmer createFarmer( @PathVariable("adminId") Long adminId,@RequestBody Farmer farmer) throws Exception {
         List<Farmer> newFarmerList = adminService.getAdminById(adminId).getFarmers();
         newFarmerList.add(farmer);
-        updateAdmin(adminId,adminService.getAdminById(adminId));
+        adminService.getAdminById(adminId).setFarmers(newFarmerList);
+        //updateAdmin(adminId,adminService.getAdminById(adminId));
+        farmer.setAdmin(adminService.getAdminById(adminId));
         return farmerService.addFarmer(farmer);
     }
     @GetMapping("/getFarmer")
@@ -125,7 +125,9 @@ public class AdminController {
     public MillFactory createMillFactory(@PathVariable("adminId") Long adminId,@RequestBody MillFactory millFactory) throws Exception {
         List<MillFactory> millFactoryList = adminService.getAdminById(adminId).getMills();
         millFactoryList.add(millFactory);
-        updateAdmin(adminId,adminService.getAdminById(adminId));
+        adminService.getAdminById(adminId).setMills(millFactoryList);
+        //updateAdmin(adminId,adminService.getAdminById(adminId));
+        millFactory.setAdmin(adminService.getAdminById(adminId));
         return millFactoryService.addMillFactory(millFactory);
     }
     @GetMapping("/getMillFactory")
@@ -144,6 +146,35 @@ public class AdminController {
     @DeleteMapping("/deleteMillFactory")
     public void deleteMillFactory(long millFactoryId) {
         millFactoryService.deleteMillFactory(millFactoryService.getMillFactoryById(millFactoryId));
+    }
+
+    //CRUD MillManager
+    @PostMapping("/createMillManager/{adminId}")
+    public MillManager createMillManager(@PathVariable("adminId") Long adminId, @RequestBody MillManager millManager) throws Exception {
+        List<MillManager> newMillManagerList = adminService.getAdminById(adminId).getMillManagerList();
+        newMillManagerList.add(millManager);
+        adminService.getAdminById(adminId).setMillManagerList(newMillManagerList);
+        //updateAdmin(adminId,adminService.getAdminById(adminId));
+        millManager.setAdmin(adminService.getAdminById(adminId));
+        return millManagerService.addMillManager(millManager);
+    }
+    @GetMapping("/getMillManagerById")
+    public MillManager getMillManagerById(@RequestParam Long managerId) {
+        return millManagerService.getMillManagerById(managerId);
+    }
+    @GetMapping("/getAllMillManagers")
+    public List<MillManager> getAllMillManagers() {
+        List<MillManager> millManagers = millManagerService.getMillManagers();
+        return millManagers;
+    }
+    @PutMapping("/updateMillManager")
+    public void updateMillManager(@RequestParam  Long managerId,MillManager millManager){
+        millManagerService.updateMillManager(managerId,millManager);
+    }
+    @DeleteMapping("/deleteMillManager")
+    public void deleteMillManager(long managerId){
+
+        millManagerService.deleteMillManager(millManagerService.getMillManagerById(managerId));
     }
 
     //Rest of Admin functions

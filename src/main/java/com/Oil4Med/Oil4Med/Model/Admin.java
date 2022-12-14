@@ -33,16 +33,16 @@ public class Admin implements Serializable {
     @Column(name="password")
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "admin")
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Farmer> farmers;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "adminCreatedConsumer")
     private List<Consumer> consumers;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "admin")
+    @OneToMany(cascade = CascadeType.ALL)
     private List<MillManager> millManagerList;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "admin")
+    @OneToMany(cascade = CascadeType.ALL)
     private List<MillFactory> mills;
 
 }
