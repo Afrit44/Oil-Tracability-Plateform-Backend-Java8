@@ -60,7 +60,7 @@ public class MillFactory implements Serializable {
     private String website;
 
     @ManyToOne
-    @JoinColumn(name = "adminId",nullable = false,referencedColumnName = "adminId")
+    @JoinColumn(name = "adminId",referencedColumnName = "adminId")
     private Admin admin;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "millFactory")

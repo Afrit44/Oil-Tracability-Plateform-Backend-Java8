@@ -149,13 +149,14 @@ public class AdminController {
     }
 
     //CRUD MillManager
-    @PostMapping("/createMillManager/{adminId}")
-    public MillManager createMillManager(@PathVariable("adminId") Long adminId, @RequestBody MillManager millManager) throws Exception {
+    @PostMapping("/createMillManager/{adminId}/{millId}")
+    public MillManager createMillManager(@PathVariable("adminId") Long adminId, @PathVariable("millId") Long millId, @RequestBody MillManager millManager) throws Exception {
         List<MillManager> newMillManagerList = adminService.getAdminById(adminId).getMillManagerList();
         newMillManagerList.add(millManager);
         adminService.getAdminById(adminId).setMillManagerList(newMillManagerList);
         //updateAdmin(adminId,adminService.getAdminById(adminId));
         millManager.setAdmin(adminService.getAdminById(adminId));
+        millManager.setMillFactory(millFactoryService.getMillFactoryById(millId));
         return millManagerService.addMillManager(millManager);
     }
     @GetMapping("/getMillManagerById")
