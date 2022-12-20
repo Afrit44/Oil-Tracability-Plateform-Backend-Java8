@@ -28,11 +28,11 @@ public class FarmerController {
     @Autowired
     private OliveSupplyForExtractionService oliveSupplyForExtractionService;
     // farmer CRUD
-    @PostMapping("/createFarmer")
-    public Farmer createFarmer(@RequestBody Farmer farmer) throws Exception {
-
-        return farmerService.addFarmer(farmer);
-    }
+//    @PostMapping("/createFarmer")
+//    public Farmer createFarmer(@RequestBody Farmer farmer) throws Exception {
+//
+//        return farmerService.addFarmer(farmer);
+//    }
     @GetMapping("/getFarmerById")
     public FarmerDTO getFarmerById(@RequestParam Long farmerId) {
         return FarmerDTO.fromEntity(farmerService.getFarmerById(farmerId));
@@ -50,10 +50,10 @@ public class FarmerController {
     public void updateFarmer(@RequestParam  Long farmerId,Farmer newFarmer){
         farmerService.updateFarmer(farmerId,newFarmer);
     }
-    @DeleteMapping("/deleteFarmer")
-    public void deleteFarmer(long farmerId){
-        farmerService.deleteFarmer(farmerService.getFarmerById(farmerId));
-    }
+//    @DeleteMapping("/deleteFarmer")
+//    public void deleteFarmer(long farmerId){
+//        farmerService.deleteFarmer(farmerService.getFarmerById(farmerId));
+//    }
     // oliveGrove CRUD
     @PostMapping("/createOliveGrove")
     public OliveGrove createFarmer(@RequestParam Long farmerId,@RequestBody OliveGrove oliveGrove) throws Exception {
@@ -107,23 +107,23 @@ public class FarmerController {
 
         return purchaseHarvestService.addPurchaseHarvest(purchaseHarvest);
     }
-    @GetMapping("/getPurchaseHarvestById")
-    public PurchaseHarvest getPurchaseHarvestById(@RequestParam Long purchaseHarvestId) {
-        return purchaseHarvestService.getPurchaseHarvestById(purchaseHarvestId);
-    }
-    @GetMapping("/getAllPurchaseHarvests")
-    public List<PurchaseHarvest> getAllPurchaseHarvests() {
-        List<PurchaseHarvest> purchaseHarvests = purchaseHarvestService.getPurchaseHarvest();
-        return purchaseHarvests;
-    }
-    @PutMapping("/updatePurchaseHarvest")
-    public void updatePurchaseHarvest(@RequestParam  Long purchaseHarvestId,PurchaseHarvest purchaseHarvest){
-        purchaseHarvestService.updatePurchaseHarvest(purchaseHarvestId,purchaseHarvest);
-    }
-    @DeleteMapping("/deletePurchaseHarvest")
-    public void deletePurchaseHarvest(long purchaseHarvestId){
-        purchaseHarvestService.deletePurchaseHarvest(purchaseHarvestService.getPurchaseHarvestById(purchaseHarvestId));
-    }
+//    @GetMapping("/getPurchaseHarvestById")
+//    public PurchaseHarvest getPurchaseHarvestById(@RequestParam Long purchaseHarvestId) {
+//        return purchaseHarvestService.getPurchaseHarvestById(purchaseHarvestId);
+//    }
+//    @GetMapping("/getAllPurchaseHarvests")
+//    public List<PurchaseHarvest> getAllPurchaseHarvests() {
+//        List<PurchaseHarvest> purchaseHarvests = purchaseHarvestService.getPurchaseHarvest();
+//        return purchaseHarvests;
+//    }
+//    @PutMapping("/updatePurchaseHarvest")
+//    public void updatePurchaseHarvest(@RequestParam  Long purchaseHarvestId,PurchaseHarvest purchaseHarvest){
+//        purchaseHarvestService.updatePurchaseHarvest(purchaseHarvestId,purchaseHarvest);
+//    }
+//    @DeleteMapping("/deletePurchaseHarvest")
+//    public void deletePurchaseHarvest(long purchaseHarvestId){
+//        purchaseHarvestService.deletePurchaseHarvest(purchaseHarvestService.getPurchaseHarvestById(purchaseHarvestId));
+//    }
 
 
     // Olive Harvest CRUD
@@ -152,8 +152,8 @@ public class FarmerController {
 
     // OliveSupplyForExtraction
     @PostMapping("/createOliveSupplyForExtraction")
-    public OliveSupplyForExtraction createOliveSupplyForExtraction(@RequestBody OliveSupplyForExtraction oliveSupplyForExtraction) throws Exception {
-
+    public OliveSupplyForExtraction createOliveSupplyForExtraction(@RequestParam Long harvestId, @RequestBody OliveSupplyForExtraction oliveSupplyForExtraction) throws Exception {
+        oliveSupplyForExtraction.setOliveHarvest(oliveHarvestService.getOliveHarvestById(harvestId));
         return oliveSupplyForExtractionService.createOSupplyForExtraction(oliveSupplyForExtraction);
     }
     @GetMapping("/getOliveSupplyForExtractionById")

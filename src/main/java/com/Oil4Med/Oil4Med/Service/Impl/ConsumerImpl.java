@@ -4,6 +4,7 @@ import com.Oil4Med.Oil4Med.Model.*;
 import com.Oil4Med.Oil4Med.Model.Enum.Buyer;
 import com.Oil4Med.Oil4Med.Model.Enum.Seller;
 import com.Oil4Med.Oil4Med.Model.Types.OilTraceability;
+import com.Oil4Med.Oil4Med.Repository.AdminRepository;
 import com.Oil4Med.Oil4Med.Repository.ConsumerRepository;
 import com.Oil4Med.Oil4Med.Service.ConsumerService;
 import com.Oil4Med.Oil4Med.Service.OilProductService;
@@ -23,6 +24,8 @@ public class ConsumerImpl implements ConsumerService {
     PurchaseOilService purchaseOilService;
     @Autowired
     OilProductService oilProductService;
+    @Autowired
+    AdminRepository adminRepository;
     @Override
     public List<Consumer> getConsumers() {
         List<Consumer> consumers = new ArrayList<>();
@@ -42,9 +45,22 @@ public class ConsumerImpl implements ConsumerService {
 
     @Override
     public void deleteConsumer(Consumer consumer) {
+
+        deleteConsumerAdminRelation(consumer);
         consumerRepository.delete(consumer);
     }
 
+    //We have to delete the foreign key in admin_Farmers table in order to fully delete the Farmer user otherwise
+    //it raise ERROR : update or delete on table "farmer" violates foreign key constraint on table "admin_farmers"
+    private void deleteConsumerAdminRelation(Consumer consumer) {
+        Admin admin = consumer.getAdminCreatedConsumer();
+        consumer.setAdminCreatedConsumer(null);
+        List<Consumer> listOfConsumersByAdmin = admin.getConsumers();
+        listOfConsumersByAdmin.remove(consumer);
+        admin.setConsumers(listOfConsumersByAdmin);
+        adminRepository.save(admin);
+        consumerRepository.save(consumer);
+    }
     @Override
     public void updateConsumer(Long consumerId, Consumer newConsumer) {
         Consumer consumer = consumerRepository.findById(consumerId).get();

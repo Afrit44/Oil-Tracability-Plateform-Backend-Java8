@@ -1,6 +1,7 @@
 package com.Oil4Med.Oil4Med.Service.Impl;
 
 import com.Oil4Med.Oil4Med.Model.*;
+import com.Oil4Med.Oil4Med.Repository.AdminRepository;
 import com.Oil4Med.Oil4Med.Repository.FarmerRepository;
 import com.Oil4Med.Oil4Med.Service.FarmerService;
 import com.Oil4Med.Oil4Med.Service.OilProductService;
@@ -23,6 +24,8 @@ public class FarmerImpl implements FarmerService {
     OliveHarvestService oliveHarvestService;
     @Autowired
     OilProductService oilProductService;
+    @Autowired
+    AdminRepository adminRepository;
 
     @Override
     public List<Farmer> getFarmers() {
@@ -42,7 +45,21 @@ public class FarmerImpl implements FarmerService {
 
     @Override
     public void deleteFarmer(Farmer farmer) {
+        deleteFarmerAdminRelation(farmer);
         farmerRepository.delete(farmer);
+
+    }
+
+    //We have to delete the foreign key in admin_Farmers table in order to fully delete the Farmer user otherwise
+    //it raise ERROR : update or delete on table "farmer" violates foreign key constraint on table "admin_farmers"
+    private void deleteFarmerAdminRelation(Farmer farmer) {
+        Admin admin = farmer.getAdmin();
+        farmer.setAdmin(null);
+        List<Farmer> listOfFarmersByAdmin = admin.getFarmers();
+        listOfFarmersByAdmin.remove(farmer);
+        admin.setFarmers(listOfFarmersByAdmin);
+        adminRepository.save(admin);
+        farmerRepository.save(farmer);
     }
 
     @Override
@@ -53,6 +70,7 @@ public class FarmerImpl implements FarmerService {
         farmer.setFirstName(newFarmer.getFirstName());
         farmer.setPassword(newFarmer.getPassword());
         farmer.setPhoneNumber(newFarmer.getPhoneNumber());
+//        farmer.setAddress(newFarmer.getAddress());
         farmerRepository.save(farmer);
     }
 

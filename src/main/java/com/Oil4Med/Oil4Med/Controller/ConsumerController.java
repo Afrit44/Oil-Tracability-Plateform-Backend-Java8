@@ -18,23 +18,23 @@ public class ConsumerController {
     @Autowired
     private ConsumerService consumerService;
 
-    @PostMapping("/createConsumer")
-    public Consumer createConsumer(@RequestBody Consumer consumer) throws Exception {
-        return consumerService.addConsumer(consumer);
-    }
-    @GetMapping("/getConsumer")
-    public ConsumerDTO findConsumerById(@RequestParam Long consumerId) {
-        return ConsumerDTO.fromEntity(consumerService.getConsumersById(consumerId));
-    }
-    @GetMapping("/getAllConsumers")
-    public List<ConsumerDTO> getAllConsumers(){
-        List<Consumer> consumers = consumerService.getConsumers();
-        List<ConsumerDTO> consumerDTOS = new ArrayList<>();
-        for (Consumer consumer : consumers){
-            consumerDTOS.add(ConsumerDTO.fromEntity(consumer));
-        }
-        return consumerDTOS;
-    }
+//    @PostMapping("/createConsumer")
+//    public Consumer createConsumer(@RequestBody Consumer consumer) throws Exception {
+//        return consumerService.addConsumer(consumer);
+//    }
+//    @GetMapping("/getConsumer")
+//    public ConsumerDTO findConsumerById(@RequestParam Long consumerId) {
+//        return ConsumerDTO.fromEntity(consumerService.getConsumersById(consumerId));
+//    }
+//    @GetMapping("/getAllConsumers")
+//    public List<ConsumerDTO> getAllConsumers(){
+//        List<Consumer> consumers = consumerService.getConsumers();
+//        List<ConsumerDTO> consumerDTOS = new ArrayList<>();
+//        for (Consumer consumer : consumers){
+//            consumerDTOS.add(ConsumerDTO.fromEntity(consumer));
+//        }
+//        return consumerDTOS;
+//    }
     @PutMapping("/updateConsumer")
     public void updateConsumer(@RequestParam  Long consumerId,Consumer newConsumer){
         consumerService.updateConsumer(consumerId,newConsumer);

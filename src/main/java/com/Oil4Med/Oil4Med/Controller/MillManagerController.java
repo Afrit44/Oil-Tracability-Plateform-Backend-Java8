@@ -146,7 +146,8 @@ public class MillManagerController {
                                         double waterPer100kg, double averageMixingTime, double pressTemperature,
                                         boolean filtration)
     {
-        return millFactoryService.processingHarvest(oliveSupplyForExtraction,millAgreement,machine,start_date,finishDate,waterPer100kg,averageMixingTime,pressTemperature,filtration);
+        return millFactoryService.processingHarvest(oliveSupplyForExtraction,millAgreement,machine,start_date,finishDate
+                ,waterPer100kg,averageMixingTime,pressTemperature,filtration);
     }
     @GetMapping("/produceOil")
     public OilProductionBatch produceOil(Extraction extraction, AnalysisType analysisType, Boolean isForSale,
@@ -160,9 +161,6 @@ public class MillManagerController {
     {
         return millFactoryService.purchaseOilFromFarmer(farmer,oilProduct,weight,
         millFactory,price);
-
-    }
-    {
 
     }
 }

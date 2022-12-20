@@ -27,7 +27,7 @@ public class AdminController {
     @Autowired
     private MillFactoryService millFactoryService;
     @Autowired
-    MillManagerService millManagerService ;
+    private MillManagerService millManagerService ;
 
     //CRUD Admin
     @PostMapping("/createAdmin")
@@ -178,45 +178,46 @@ public class AdminController {
         millManagerService.deleteMillManager(millManagerService.getMillManagerById(managerId));
     }
 
-    //Rest of Admin functions
-    @GetMapping("/purchaseOilFromFarmer")
-    public PurchaseOil purchaseOilFromFarmer(Consumer consumer, Farmer farmer, OilProduct oilProduct, double quantity, double price) {
-        return consumerService.purchaseOilFromFarmer(consumer,farmer,oilProduct,quantity,price);
-    }
-
-    @GetMapping("/purchaseOilFromMill")
-    public PurchaseOil purchaseOilFromMill(MillFactory millFactory, OilProduct oilProduct, double quantity, double price, Consumer consumer) {
-        return consumerService.purchaseOilFromMill(millFactory,oilProduct,quantity,price,consumer);
-    }
-
-    @GetMapping("/checkTraceability")
-    public OilTraceability checkTraceability(OilProduct oilProduct) {
-        return consumerService.checkTraceability(oilProduct);
-    }
-    @PostMapping("/addOliveRegion")
-    public void addOliveRegion() {
-        adminService.addOliveRegion();
-    }
-
-    @DeleteMapping("/deleteOliveRegion")
-    public void deleteOliveRegion() {
-        adminService.deleteOliveRegion();
-    }
-
-    @PostMapping("/addZone")
-    public void addZone() {
-        adminService.addZone();
-    }
-
-    @PutMapping("/updateZone")
-    public void updateZone() {
-        adminService.updateZone();
-    }
-
-    @DeleteMapping("/deleteZone")
-    public void deleteZone() {
-        adminService.deleteZone();
-    }
+//
+//    //Rest of Admin functions
+//    @GetMapping("/purchaseOilFromFarmer")
+//    public PurchaseOil purchaseOilFromFarmer(Consumer consumer, Farmer farmer, OilProduct oilProduct, double quantity, double price) {
+//        return consumerService.purchaseOilFromFarmer(consumer,farmer,oilProduct,quantity,price);
+//    }
+//
+//    @GetMapping("/purchaseOilFromMill")
+//    public PurchaseOil purchaseOilFromMill(MillFactory millFactory, OilProduct oilProduct, double quantity, double price, Consumer consumer) {
+//        return consumerService.purchaseOilFromMill(millFactory,oilProduct,quantity,price,consumer);
+//    }
+//
+//    @GetMapping("/checkTraceability")
+//    public OilTraceability checkTraceability(OilProduct oilProduct) {
+//        return consumerService.checkTraceability(oilProduct);
+//    }
+//    @PostMapping("/addOliveRegion")
+//    public void addOliveRegion() {
+//        adminService.addOliveRegion();
+//    }
+//
+//    @DeleteMapping("/deleteOliveRegion")
+//    public void deleteOliveRegion() {
+//        adminService.deleteOliveRegion();
+//    }
+//
+//    @PostMapping("/addZone")
+//    public void addZone() {
+//        adminService.addZone();
+//    }
+//
+//    @PutMapping("/updateZone")
+//    public void updateZone() {
+//        adminService.updateZone();
+//    }
+//
+//    @DeleteMapping("/deleteZone")
+//    public void deleteZone() {
+//        adminService.deleteZone();
+//    }
 
 
 

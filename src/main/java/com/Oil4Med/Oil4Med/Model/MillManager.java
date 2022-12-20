@@ -29,10 +29,10 @@ public class MillManager {
     private String password;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="millId",nullable = false,referencedColumnName = "millId")
+    @JoinColumn(name="millId",referencedColumnName = "millId")
     private MillFactory millFactory;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="adminId",nullable = false,referencedColumnName = "adminId")
+    @JoinColumn(name="adminId",referencedColumnName = "adminId")
     private Admin admin;
 }

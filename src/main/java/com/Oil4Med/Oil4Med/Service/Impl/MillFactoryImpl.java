@@ -5,7 +5,9 @@ import com.Oil4Med.Oil4Med.Model.Enum.AnalysisType;
 import com.Oil4Med.Oil4Med.Model.Enum.Buyer;
 import com.Oil4Med.Oil4Med.Model.Enum.Owner;
 import com.Oil4Med.Oil4Med.Model.Enum.Seller;
+import com.Oil4Med.Oil4Med.Repository.AdminRepository;
 import com.Oil4Med.Oil4Med.Repository.MillFactoryRepository;
+import com.Oil4Med.Oil4Med.Repository.MillManagerRepository;
 import com.Oil4Med.Oil4Med.Repository.OliveSupplyForExtractionRepository;
 import com.Oil4Med.Oil4Med.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +30,11 @@ public class MillFactoryImpl implements MillFactoryService {
     OliveSupplyForExtractionRepository oliveSupplyForExtractionRepository;
     @Autowired
     OilProductService oilProductService;
+    @Autowired
+    AdminRepository adminRepository;
+    @Autowired
+    private MillManagerRepository millManagerRepository;
 
-    public MillFactoryImpl(MillFactoryRepository millFactoryRepository){
-        this.millFactoryRepository=millFactoryRepository;
-    }
     @Override
     public List<MillFactory> getMillFactories() {
         List<MillFactory> millFactories  = new ArrayList<>();
@@ -51,9 +54,25 @@ public class MillFactoryImpl implements MillFactoryService {
 
     @Override
     public void deleteMillFactory(MillFactory millFactory) {
+
+        deleteMillFactoryAdminRelation(millFactory);
         millFactoryRepository.delete(millFactory);
     }
 
+    //We have to delete the foreign key in admin_Farmers table in order to fully delete the Farmer user otherwise
+    //it raise ERROR : update or delete on table "farmer" violates foreign key constraint on table "admin_farmers"
+    private void deleteMillFactoryAdminRelation(MillFactory millFactory) {
+        Admin admin = millFactory.getAdmin();
+        MillManager millManager = millFactory.getMillManager();
+        millFactory.setMillManager(null);
+        millFactory.setAdmin(null);
+        admin.getMills().remove(millFactory);
+        admin.setMills(admin.getMills());
+        millManager.setMillFactory(null);
+        millManagerRepository.save(millManager);
+        adminRepository.save(admin);
+        millFactoryRepository.save(millFactory);
+    }
     @Override
     public void updateMillFactory(Long id, MillFactory millFactory) {
         MillFactory millFactoryFromDb = millFactoryRepository.findById(id).get();
