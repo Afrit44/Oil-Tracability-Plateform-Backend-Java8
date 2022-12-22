@@ -11,7 +11,7 @@ public interface FarmerService {
     Farmer addFarmer(Farmer farmer);
     void deleteFarmer(Farmer farmer);
     void updateFarmer(Long farmerId, Farmer newFarmer);
-    OliveSupplyForExtraction transportHarvestToMill(OliveHarvest oliveHarvest, double weight);
+    OliveSupplyForExtraction transportHarvestToMill(Long harvestId, double weight);
     void sellOil(OilProduct oilProduct, double oilQuantity, Consumer consumer);
     void setIntentionToSellOlive(OliveHarvest oliveHarvest);
     void setIntentionToSellOil(OilProduct oilProduct);

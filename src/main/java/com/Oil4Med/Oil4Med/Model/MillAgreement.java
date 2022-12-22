@@ -38,19 +38,19 @@ public class MillAgreement implements Serializable {
     @Column(name = "processing_date")
     private Date processingDate;
 
-    @Column(name = "harvest_id", nullable = false)
+    @Column(name = "harvest_id")
     private Long harvestId;
 
     @ManyToOne
-    @JoinColumn(name="farmerId",nullable = false,referencedColumnName = "farmerId")
+    @JoinColumn(name="farmerId",referencedColumnName = "farmerId")
     private Farmer farmer;
 
     @ManyToOne
-    @JoinColumn(name="millId",nullable = false,referencedColumnName = "millId")
+    @JoinColumn(name="millId",referencedColumnName = "millId")
     private MillFactory millFactory;
 
-    @ManyToOne
-    @JoinColumn(name="extractionId",nullable = false,referencedColumnName = "extractionId")
-    private Extraction extraction;
+//    @ManyToOne
+//    @JoinColumn(name="extractionId",referencedColumnName = "extractionId")
+//    private Extraction extraction;
 
 }

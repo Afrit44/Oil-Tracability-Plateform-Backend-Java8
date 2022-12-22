@@ -68,7 +68,7 @@ public class OliveHarvest implements Serializable {
     private double quantity;
 
     @ManyToOne
-    @JoinColumn(name="groveId",nullable = false,referencedColumnName = "groveId")
+    @JoinColumn(name="groveId",referencedColumnName = "groveId")
     private OliveGrove oliveGrove;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "oliveHarvest")

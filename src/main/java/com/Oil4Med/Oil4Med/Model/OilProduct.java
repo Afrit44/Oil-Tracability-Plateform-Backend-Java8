@@ -59,11 +59,11 @@ public class OilProduct implements Serializable {
 
 
     @ManyToOne
-    @JoinColumn(name = "productionBatchId",nullable = false,referencedColumnName = "productionBatchId")
+    @JoinColumn(name = "productionBatchId",referencedColumnName = "productionBatchId")
     private OilProductionBatch oilProductionBatch;
 
     @ManyToOne
-    @JoinColumn(name = "packagingId",nullable = false,referencedColumnName = "packagingId")
+    @JoinColumn(name = "packagingId",referencedColumnName = "packagingId")
     private PackagingOperation packagingOperation;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "oilProduct")

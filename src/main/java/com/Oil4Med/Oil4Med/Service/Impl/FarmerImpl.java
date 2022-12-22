@@ -3,6 +3,7 @@ package com.Oil4Med.Oil4Med.Service.Impl;
 import com.Oil4Med.Oil4Med.Model.*;
 import com.Oil4Med.Oil4Med.Repository.AdminRepository;
 import com.Oil4Med.Oil4Med.Repository.FarmerRepository;
+import com.Oil4Med.Oil4Med.Repository.OliveHarvestRepository;
 import com.Oil4Med.Oil4Med.Service.FarmerService;
 import com.Oil4Med.Oil4Med.Service.OilProductService;
 import com.Oil4Med.Oil4Med.Service.OliveHarvestService;
@@ -26,6 +27,8 @@ public class FarmerImpl implements FarmerService {
     OilProductService oilProductService;
     @Autowired
     AdminRepository adminRepository;
+    @Autowired
+    private OliveHarvestRepository oliveHarvestRepository;
 
     @Override
     public List<Farmer> getFarmers() {
@@ -75,7 +78,8 @@ public class FarmerImpl implements FarmerService {
     }
 
     @Override
-    public OliveSupplyForExtraction transportHarvestToMill(OliveHarvest oliveHarvest, double weight) {
+    public OliveSupplyForExtraction transportHarvestToMill(Long harvestId, double weight) {
+        OliveHarvest oliveHarvest = oliveHarvestRepository.getById(harvestId);
         //Subtract the weight from the initial harvest
         if (oliveHarvest.getQuantity()-weight<0){
             //Quantity subtracted is more than the one already in hand.

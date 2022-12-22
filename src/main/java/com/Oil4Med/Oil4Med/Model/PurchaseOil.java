@@ -40,10 +40,10 @@ public class PurchaseOil implements Serializable {
     private double quantity;
 
     @ManyToOne
-    @JoinColumn(name = "consumerId",nullable = false,referencedColumnName = "consumerId")
+    @JoinColumn(name = "consumerId",referencedColumnName = "consumerId")
     private Consumer consumer;
 
     @ManyToOne
-    @JoinColumn(name = "oilProductId",nullable = false,referencedColumnName = "oilProductId")
+    @JoinColumn(name = "oilProductId",referencedColumnName = "oilProductId")
     private OilProduct oilProduct;
 }

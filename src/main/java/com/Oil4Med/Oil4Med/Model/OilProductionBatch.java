@@ -41,7 +41,7 @@ public class OilProductionBatch implements Serializable {
     private Owner owner;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "extractionId",nullable = false,referencedColumnName = "extractionId")
+    @JoinColumn(name = "extractionId",referencedColumnName = "extractionId")
     private Extraction extraction;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "oilProductionBatch")

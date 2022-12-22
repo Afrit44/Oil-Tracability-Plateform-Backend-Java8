@@ -26,10 +26,10 @@ public class PurchaseHarvest implements Serializable {
     private double quantity;
 
     @ManyToOne
-    @JoinColumn(name = "millId",nullable = false,referencedColumnName = "millId")
+    @JoinColumn(name = "millId",referencedColumnName = "millId")
     private MillFactory millFactory;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "harvestId",nullable = false,referencedColumnName = "harvestId")
+    @JoinColumn(name = "harvestId",referencedColumnName = "harvestId")
     private OliveHarvest oliveHarvest;
 }

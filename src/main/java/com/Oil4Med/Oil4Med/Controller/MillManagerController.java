@@ -2,9 +2,11 @@ package com.Oil4Med.Oil4Med.Controller;
 
 import com.Oil4Med.Oil4Med.Model.*;
 import com.Oil4Med.Oil4Med.Model.Enum.AnalysisType;
+import com.Oil4Med.Oil4Med.Model.Enum.ExtractionStatus;
 import com.Oil4Med.Oil4Med.Model.Enum.Owner;
 import com.Oil4Med.Oil4Med.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -24,6 +26,10 @@ public class MillManagerController {
     ExtractionService extractionService;
     @Autowired
     OilProductionBatchService oilProductionBatchService;
+    @Autowired
+    OliveSupplyForExtractionService oliveSupplyForExtractionService;
+    @Autowired
+    MillAgreementService millAgreementService;
     //Crud MillManager
     @PostMapping("/createMillManager")
     public MillManager createMillManager(@RequestBody MillManager millManager) throws Exception {
@@ -72,7 +78,8 @@ public class MillManagerController {
     }
     //Crud machine
     @PostMapping("/createMachine")
-    public Machine createMachine(@RequestBody Machine machine) throws Exception {
+    public Machine createMachine(@RequestParam Long millId, @RequestBody Machine machine) throws Exception {
+        machine.setMillFactory(millFactoryService.getMillFactoryById(millId));
         return machineService.addMachine(machine);
     }
     @GetMapping("/getMachineById")
@@ -140,14 +147,25 @@ public class MillManagerController {
        oilProductionBatchService.deleteOilProductionBatch(oilProductionBatchId);
     }
    // the rest of MillFactory methods
-    @GetMapping("/processingHarvest")
-    public Extraction processingHarvest(OliveSupplyForExtraction oliveSupplyForExtraction, MillAgreement millAgreement,
-                                        Machine machine, Date start_date, Date finishDate,
-                                        double waterPer100kg, double averageMixingTime, double pressTemperature,
-                                        boolean filtration)
+    @PostMapping("/processingHarvest")
+    public Extraction processingHarvest(@RequestParam Long oliveSupplyForExtractionId ,
+                                        @RequestParam Long millAgreementId,
+                                        @RequestParam Long machineId,
+                                        @RequestParam ExtractionStatus extractionStatus,
+                                        @RequestParam("Finish_date")
+                                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)Date start_date,
+                                        @RequestParam("Start_date")
+                                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)Date finishDate,
+                                        @RequestParam double waterPer100kg,
+                                        @RequestParam double averageMixingTime,
+                                        @RequestParam double pressTemperature,
+                                        @RequestParam boolean filtration)
     {
-        return millFactoryService.processingHarvest(oliveSupplyForExtraction,millAgreement,machine,start_date,finishDate
-                ,waterPer100kg,averageMixingTime,pressTemperature,filtration);
+        return millFactoryService.processingHarvest(
+                oliveSupplyForExtractionService.getOSupplyForExtractById(oliveSupplyForExtractionId),
+                millAgreementService.getMillAgreementById(millAgreementId), extractionStatus,
+                machineService.getMachineById(machineId),start_date,finishDate,waterPer100kg,averageMixingTime,
+                pressTemperature,filtration);
     }
     @GetMapping("/produceOil")
     public OilProductionBatch produceOil(Extraction extraction, AnalysisType analysisType, Boolean isForSale,

@@ -1,14 +1,8 @@
 package com.Oil4Med.Oil4Med.Service.Impl;
 
 import com.Oil4Med.Oil4Med.Model.*;
-import com.Oil4Med.Oil4Med.Model.Enum.AnalysisType;
-import com.Oil4Med.Oil4Med.Model.Enum.Buyer;
-import com.Oil4Med.Oil4Med.Model.Enum.Owner;
-import com.Oil4Med.Oil4Med.Model.Enum.Seller;
-import com.Oil4Med.Oil4Med.Repository.AdminRepository;
-import com.Oil4Med.Oil4Med.Repository.MillFactoryRepository;
-import com.Oil4Med.Oil4Med.Repository.MillManagerRepository;
-import com.Oil4Med.Oil4Med.Repository.OliveSupplyForExtractionRepository;
+import com.Oil4Med.Oil4Med.Model.Enum.*;
+import com.Oil4Med.Oil4Med.Repository.*;
 import com.Oil4Med.Oil4Med.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +27,9 @@ public class MillFactoryImpl implements MillFactoryService {
     @Autowired
     AdminRepository adminRepository;
     @Autowired
-    private MillManagerRepository millManagerRepository;
+    MillManagerRepository millManagerRepository;
+    @Autowired
+    ExtractionRepository extractionRepository;
 
     @Override
     public List<MillFactory> getMillFactories() {
@@ -94,23 +90,44 @@ public class MillFactoryImpl implements MillFactoryService {
 
     @Override
     public Extraction processingHarvest(OliveSupplyForExtraction oliveSupplyForExtraction, MillAgreement millAgreement,
-                                        Machine machine, Date start_date, Date finishDate,
-                                        double waterPer100kg, double averageMixingTime, double pressTemperature,
+                                        ExtractionStatus extractionStatus,Machine machine,
+                                        Date start_date, Date finishDate, double waterPer100kg,
+                                        double averageMixingTime, double pressTemperature,
                                         boolean filtration) {
 
         //Creation of the new extraction
         Extraction extraction = new Extraction();
-        extraction.setExtractionStatus(null);
+        extraction.setExtractionStatus(extractionStatus);
         extraction.setStartDate(start_date);
         extraction.setFinishDate(finishDate);
         extraction.setWaterPer100Kg(waterPer100kg);
         extraction.setAverageMixingTime(averageMixingTime);
         extraction.setPressTemperature(pressTemperature);
         extraction.setFiltration(filtration);
-        extraction.getOliveSupplyForExtractionList().add(oliveSupplyForExtraction);
-        extraction.getMachinesList().add(machine);
-        extraction.getMillAgreementList().add(millAgreement);
+
+        //I'll comment it later since maandich wsaa el bel tawa. TODO
+        List<OliveSupplyForExtraction> listOSFE;
+        if(extraction.getOliveSupplyForExtractionList()==null){
+            listOSFE = new ArrayList<>();
+        }else{
+            listOSFE = extraction.getOliveSupplyForExtractionList();
+        }
+        listOSFE.add(oliveSupplyForExtraction);
+        extraction.setOliveSupplyForExtractionList(listOSFE);
+
+        //I'll comment it later since maandich wsaa el bel tawa. 2.0 TODO
+        List<Machine> listMachine;
+        if (extraction.getMachinesList()==null){
+            listMachine = new ArrayList<>();
+        }else{
+            listMachine = extraction.getMachinesList();
+        }
+        listMachine.add(machine);
+        extraction.setMachinesList(listMachine);
+
+//        extraction.getMillAgreementList().add(millAgreement);
         extraction=extractionService.addExtraction(extraction);
+        extractionRepository.save(extraction);
         //Link extraction with the initial oliveSupply
         oliveSupplyForExtraction.getExtractionList().add(extraction);
         oliveSupplyForExtractionRepository.save(oliveSupplyForExtraction);

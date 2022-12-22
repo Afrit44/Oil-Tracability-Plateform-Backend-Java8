@@ -15,8 +15,10 @@ public class MillAgreementImpl implements MillAgreementService {
     @Autowired
     MillAgreementRepository millAgreementRepository;
 
-    public MillAgreementImpl(MillAgreementRepository millAgreementRepository){
-        this.millAgreementRepository = millAgreementRepository;
+    @Override
+    public MillAgreement addMillAgreement(MillAgreement millAgreement) {
+
+        return millAgreementRepository.save(millAgreement);
     }
     @Override
     public List<MillAgreement> getMillAgreements() {
@@ -24,30 +26,21 @@ public class MillAgreementImpl implements MillAgreementService {
         millAgreementRepository.findAll().forEach(millAgreements::add);
         return millAgreements;
     }
-
     @Override
     public MillAgreement getMillAgreementById(Long id) {
 
         return millAgreementRepository.findById(id).get();
     }
-
-    @Override
-    public MillAgreement addMillAgreement(MillAgreement millAgreement) {
-
-        return millAgreementRepository.save(millAgreement);
-    }
-
     @Override
     public void deleteMillAgreement(MillAgreement millAgreement) {
         millAgreementRepository.delete(millAgreement);
     }
-
     @Override
     public void updateMillAgreement(Long id, MillAgreement millAgreement) {
         MillAgreement millAgreementFromDb = millAgreementRepository.findById(id).get();
         millAgreementFromDb.setMillAgreementId(millAgreement.getMillAgreementId());
         millAgreementFromDb.setHarvestId(millAgreement.getHarvestId());
-        millAgreementFromDb.setExtraction(millAgreement.getExtraction());
+//        millAgreementFromDb.setExtraction(millAgreement.getExtraction());
         millAgreementFromDb.setOliveQuantity(millAgreement.getOliveQuantity());
         millAgreementFromDb.setOliveQuantityToMill(millAgreement.getOliveQuantityToMill());
         millAgreementFromDb.setMillOlive(millAgreement.isMillOlive());

@@ -20,13 +20,14 @@ public class FarmerController {
     @Autowired
     private MillAgreementService millAgreementService ;
     @Autowired
-    private AdminService adminService ;
-    @Autowired
     private OliveHarvestService oliveHarvestService ;
     @Autowired
     private  PurchaseHarvestService purchaseHarvestService ;
     @Autowired
     private OliveSupplyForExtractionService oliveSupplyForExtractionService;
+    @Autowired
+    private MillFactoryService millFactoryService;
+
     // farmer CRUD
 //    @PostMapping("/createFarmer")
 //    public Farmer createFarmer(@RequestBody Farmer farmer) throws Exception {
@@ -79,8 +80,11 @@ public class FarmerController {
     }
     // Mill Agreement CRUD
     @PostMapping("/createMillAgreement")
-    public MillAgreement createMillAgreement(@RequestBody MillAgreement millAgreement) throws Exception {
-
+    public MillAgreement createMillAgreement(@RequestParam Long millId, @RequestParam Long farmerId,
+                                             @RequestParam Long harvestId, @RequestBody MillAgreement millAgreement) throws Exception {
+        millAgreement.setHarvestId(harvestId);
+        millAgreement.setMillFactory(millFactoryService.getMillFactoryById(millId));
+        millAgreement.setFarmer(farmerService.getFarmerById(farmerId));
         return millAgreementService.addMillAgreement(millAgreement);
     }
     @GetMapping("/getMillAgreementById")
@@ -151,11 +155,11 @@ public class FarmerController {
     }
 
     // OliveSupplyForExtraction
-    @PostMapping("/createOliveSupplyForExtraction")
-    public OliveSupplyForExtraction createOliveSupplyForExtraction(@RequestParam Long harvestId, @RequestBody OliveSupplyForExtraction oliveSupplyForExtraction) throws Exception {
-        oliveSupplyForExtraction.setOliveHarvest(oliveHarvestService.getOliveHarvestById(harvestId));
-        return oliveSupplyForExtractionService.createOSupplyForExtraction(oliveSupplyForExtraction);
-    }
+//    @PostMapping("/createOliveSupplyForExtraction")
+//    public OliveSupplyForExtraction createOliveSupplyForExtraction(@RequestParam Long harvestId, @RequestBody OliveSupplyForExtraction oliveSupplyForExtraction) throws Exception {
+//        oliveSupplyForExtraction.setOliveHarvest(oliveHarvestService.getOliveHarvestById(harvestId));
+//        return oliveSupplyForExtractionService.createOSupplyForExtraction(oliveSupplyForExtraction);
+//    }
     @GetMapping("/getOliveSupplyForExtractionById")
     public OliveSupplyForExtraction getOliveSupplyForExtractionById(@RequestParam Long oliveSId) {
         return oliveSupplyForExtractionService.getOSupplyForExtractById(oliveSId);
@@ -173,31 +177,26 @@ public class FarmerController {
     public void deleteOliveSupplyForExtraction(long oliveSId){
         oliveSupplyForExtractionService.deleteOSupplyForExtraction(oliveSId);
     }
-    @GetMapping("/transportHarvestToMill")
-    public OliveSupplyForExtraction transportHarvestToMill(OliveHarvest oliveHarvest, double weight)
+    @PostMapping("/transportHarvestToMill")
+    public OliveSupplyForExtraction transportHarvestToMill(Long oliveHarvestId, double weight)
     {
-        return(farmerService.transportHarvestToMill(oliveHarvest,weight));
+        return(farmerService.transportHarvestToMill(oliveHarvestId,weight));
     }
-    @GetMapping("/sellOil")
+    @PutMapping("/sellOil")
     public void sellOil(OilProduct oilProduct, double oilQuantity, Consumer consumer)
     {
         farmerService.sellOil(oilProduct,oilQuantity,consumer);
     }
-    @GetMapping("/setIntentionToSellOlive")
+    @PutMapping("/setIntentionToSellOlive")
     public void setIntentionToSellOlive(OliveHarvest oliveHarvest)
     {
         farmerService.setIntentionToSellOlive(oliveHarvest);
     }
-    @GetMapping("/setIntentionToSellOil")
+    @PutMapping("/setIntentionToSellOil")
     public void setIntentionToSellOil(OilProduct oilProduct)
     {
         farmerService.setIntentionToSellOil(oilProduct);
     }
-
-
-
-
-
 
 
 }

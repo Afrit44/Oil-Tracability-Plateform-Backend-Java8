@@ -63,7 +63,7 @@ public class OliveGrove implements Serializable {
     private boolean irrigation;
 
     @ManyToOne
-    @JoinColumn(name = "farmerId",nullable = false,referencedColumnName = "farmerId")
+    @JoinColumn(name = "farmerId",referencedColumnName = "farmerId")
     private Farmer farmer;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "oliveGrove")
