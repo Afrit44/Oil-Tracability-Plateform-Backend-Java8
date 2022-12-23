@@ -3,14 +3,15 @@ package com.Oil4Med.Oil4Med.Model;
 import com.Oil4Med.Oil4Med.Model.Enum.StoringMean;
 import com.Oil4Med.Oil4Med.Model.Types.Address;
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -59,6 +60,7 @@ public class MillFactory implements Serializable {
     @Column(name = "website")
     private String website;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "adminId",referencedColumnName = "adminId")
     private Admin admin;

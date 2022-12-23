@@ -3,6 +3,7 @@ package com.Oil4Med.Oil4Med.Model;
 import com.Oil4Med.Oil4Med.Model.Enum.ExtractionStatus;
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -53,9 +54,11 @@ public class Extraction implements Serializable {
     @Column(name = "filtration")
     private boolean filtration;
 
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
     private List<OliveSupplyForExtraction> oliveSupplyForExtractionList;
 
+    @JsonIgnore
     @ManyToMany
 //    @JoinColumn(name="machines_id")
     private List<Machine> machinesList;

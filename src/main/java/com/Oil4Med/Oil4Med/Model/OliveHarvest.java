@@ -3,6 +3,8 @@ package com.Oil4Med.Oil4Med.Model;
 import com.Oil4Med.Oil4Med.Model.Enum.*;
 import com.Oil4Med.Oil4Med.Model.Types.Address;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -67,6 +69,7 @@ public class OliveHarvest implements Serializable {
     @Column(name = "Quantity")
     private double quantity;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="groveId",referencedColumnName = "groveId")
     private OliveGrove oliveGrove;

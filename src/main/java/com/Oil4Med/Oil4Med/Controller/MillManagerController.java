@@ -30,6 +30,11 @@ public class MillManagerController {
     OliveSupplyForExtractionService oliveSupplyForExtractionService;
     @Autowired
     MillAgreementService millAgreementService;
+    @Autowired
+    FarmerService farmerService;
+    @Autowired
+    OilProductService oilProductService;
+
     //Crud MillManager
     @PostMapping("/createMillManager")
     public MillManager createMillManager(@RequestBody MillManager millManager) throws Exception {
@@ -167,18 +172,19 @@ public class MillManagerController {
                 machineService.getMachineById(machineId),start_date,finishDate,waterPer100kg,averageMixingTime,
                 pressTemperature,filtration);
     }
-    @GetMapping("/produceOil")
-    public OilProductionBatch produceOil(Extraction extraction, AnalysisType analysisType, Boolean isForSale,
+    @PostMapping("/produceOil")
+    public OilProductionBatch produceOil(Long extractionId, AnalysisType analysisType, Boolean isForSale,
                                          double oilQuantity, Owner owner)
     {
-        return millFactoryService.produceOil(extraction,analysisType,isForSale,oilQuantity,owner);
+        return millFactoryService.produceOil(extractionService.getExtractionById(extractionId),
+                analysisType,isForSale,oilQuantity,owner);
     }
-    @GetMapping("/purchaseOilFromFarmer")
-    public PurchaseOil purchaseOilFromFarmer(Farmer farmer, OilProduct oilProduct, double weight,
-                                             MillFactory millFactory, double price)
+    @PostMapping("/purchaseOilFromFarmer")
+    public PurchaseOil purchaseOilFromFarmer(Long farmerId, Long oilProductId, double quantity,
+                                             Long millFactoryId, double price)
     {
-        return millFactoryService.purchaseOilFromFarmer(farmer,oilProduct,weight,
-        millFactory,price);
-
+        return millFactoryService.purchaseOilFromFarmer(farmerService.getFarmerById(farmerId),
+                oilProductService.getOilProductById(oilProductId),quantity,
+                millFactoryService.getMillFactoryById(millFactoryId),price);
     }
 }

@@ -1,5 +1,6 @@
 package com.Oil4Med.Oil4Med.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public class Consumer implements Serializable {
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "consumer")
     private List<PurchaseOil> purchaseOilListByConsumer;
 
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="adminId",referencedColumnName = "adminId")
     private Admin adminCreatedConsumer;

@@ -1,6 +1,8 @@
 package com.Oil4Med.Oil4Med.Model;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,10 +43,12 @@ public class MillAgreement implements Serializable {
     @Column(name = "harvest_id")
     private Long harvestId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="farmerId",referencedColumnName = "farmerId")
     private Farmer farmer;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="millId",referencedColumnName = "millId")
     private MillFactory millFactory;

@@ -1,6 +1,8 @@
 package com.Oil4Med.Oil4Med.Model;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,9 +32,11 @@ public class Machine implements Serializable {
     @Column(name="purchaseDate")
     private Date purchaseDate;
 
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
     private List<Extraction> extractions;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "millId",nullable = false,referencedColumnName = "millId")
     private MillFactory millFactory;

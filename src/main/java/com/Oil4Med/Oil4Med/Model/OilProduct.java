@@ -2,6 +2,8 @@ package com.Oil4Med.Oil4Med.Model;
 
 import com.Oil4Med.Oil4Med.Model.Enum.*;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -57,11 +59,12 @@ public class OilProduct implements Serializable {
     @Column(name = "is_For_Sale")
     private boolean isForSale;
 
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "productionBatchId",referencedColumnName = "productionBatchId")
     private OilProductionBatch oilProductionBatch;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "packagingId",referencedColumnName = "packagingId")
     private PackagingOperation packagingOperation;
@@ -69,8 +72,8 @@ public class OilProduct implements Serializable {
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "oilProduct")
     private List<PurchaseOil> purchaseOilList;
 
-//    @ManyToOne
-//    @JoinColumn(name = "storageAreaId",nullable = false,referencedColumnName = "storageAreaId")
-//    private StorageArea storageArea;
+    @ManyToOne
+    @JoinColumn(name = "storageAreaId",referencedColumnName = "storageAreaId")
+    private StorageArea storageArea;
 
 }

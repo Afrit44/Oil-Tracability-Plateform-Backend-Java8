@@ -1,6 +1,8 @@
 package com.Oil4Med.Oil4Med.Model;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,6 +34,7 @@ public class MillManager {
     @JoinColumn(name="millId",referencedColumnName = "millId")
     private MillFactory millFactory;
 
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="adminId",referencedColumnName = "adminId")
     private Admin admin;

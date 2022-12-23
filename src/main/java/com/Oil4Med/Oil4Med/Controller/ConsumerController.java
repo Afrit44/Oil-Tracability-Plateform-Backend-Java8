@@ -4,6 +4,8 @@ import com.Oil4Med.Oil4Med.DTO.ConsumerDTO;
 import com.Oil4Med.Oil4Med.Model.*;
 import com.Oil4Med.Oil4Med.Model.Types.OilTraceability;
 import com.Oil4Med.Oil4Med.Service.ConsumerService;
+import com.Oil4Med.Oil4Med.Service.FarmerService;
+import com.Oil4Med.Oil4Med.Service.OilProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,10 @@ public class ConsumerController {
 
     @Autowired
     private ConsumerService consumerService;
+    @Autowired
+    private FarmerService farmerService;
+    @Autowired
+    private OilProductService oilProductService;
 
 //    @PostMapping("/createConsumer")
 //    public Consumer createConsumer(@RequestBody Consumer consumer) throws Exception {
@@ -44,19 +50,20 @@ public class ConsumerController {
         consumerService.deleteConsumer(consumerService.getConsumersById(consumerId));
     }
 
-    @GetMapping("/purchaseOilFromFarmer")
-    public PurchaseOil purchaseOilFromFarmer(Consumer consumer, Farmer farmer, OilProduct oilProduct, double quantity, double price) {
-        return consumerService.purchaseOilFromFarmer(consumer,farmer,oilProduct,quantity,price);
+    @PostMapping("/purchaseOilFromFarmer")
+    public PurchaseOil purchaseOilFromFarmer(Long consumerId, Long farmerId, Long oilProductId, double quantity, double price) {
+        return consumerService.purchaseOilFromFarmer(consumerService.getConsumersById(consumerId),
+                farmerService.getFarmerById(farmerId), oilProductService.getOilProductById(oilProductId),quantity,price);
     }
 
-    @GetMapping("/purchaseOilFromMill")
+    @PostMapping("/purchaseOilFromMill")
     public PurchaseOil purchaseOilFromMill(MillFactory millFactory, OilProduct oilProduct, double quantity, double price, Consumer consumer) {
         return consumerService.purchaseOilFromMill(millFactory,oilProduct,quantity,price,consumer);
     }
 
     @GetMapping("/checkTraceability")
-    public OilTraceability checkTraceability(OilProduct oilProduct) {
-        return consumerService.checkTraceability(oilProduct);
+    public OilTraceability checkTraceability(Long oilProductId) {
+        return consumerService.checkTraceability(oilProductService.getOilProductById(oilProductId));
     }
 
 }

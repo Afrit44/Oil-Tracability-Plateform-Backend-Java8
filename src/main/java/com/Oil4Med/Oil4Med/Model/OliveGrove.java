@@ -5,6 +5,8 @@ import com.Oil4Med.Oil4Med.Model.Enum.TypeOfOlive;
 import com.Oil4Med.Oil4Med.Model.Enum.TypeOfSoil;
 import com.Oil4Med.Oil4Med.Model.Types.Address;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -62,6 +64,7 @@ public class OliveGrove implements Serializable {
     @Column(name = "irrigation")
     private boolean irrigation;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "farmerId",referencedColumnName = "farmerId")
     private Farmer farmer;

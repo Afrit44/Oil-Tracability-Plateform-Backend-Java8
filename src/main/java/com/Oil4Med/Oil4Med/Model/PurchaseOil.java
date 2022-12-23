@@ -3,6 +3,8 @@ package com.Oil4Med.Oil4Med.Model;
 import com.Oil4Med.Oil4Med.Model.Enum.Buyer;
 import com.Oil4Med.Oil4Med.Model.Enum.Seller;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,10 +41,12 @@ public class PurchaseOil implements Serializable {
     @Column(name = "quantity")
     private double quantity;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "consumerId",referencedColumnName = "consumerId")
     private Consumer consumer;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "oilProductId",referencedColumnName = "oilProductId")
     private OilProduct oilProduct;

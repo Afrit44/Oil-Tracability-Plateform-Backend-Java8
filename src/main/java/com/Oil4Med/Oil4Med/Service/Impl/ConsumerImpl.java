@@ -126,12 +126,12 @@ public class ConsumerImpl implements ConsumerService {
             oilTraceability.setStorageAreaId(null);
         }
 
-//        //Checking if the Oil Has been stocked, If yes then we Set the StorageAreaId
-//        if (oilProduct.isStored()){
-//            oilTraceability.setStorageAreaId(oilProduct.getStorageArea().getStorageAreaId());
-//        }else{
-//            oilTraceability.setStorageAreaId(null);
-//        }
+        //Checking if the Oil Has been stocked, If yes then we Set the StorageAreaId
+        if (oilProduct.isStored()){
+            oilTraceability.setStorageAreaId(oilProduct.getStorageArea().getStorageAreaId());
+        }else{
+            oilTraceability.setStorageAreaId(null);
+        }
 
         //Setting oilProductionBatchId
         OilProductionBatch oilProductionBatch = oilProduct.getOilProductionBatch();
@@ -186,6 +186,7 @@ public class ConsumerImpl implements ConsumerService {
             oliveHarvestIdList.add(oliveGrove.getFarmer().getFarmerId());
         }
         oilTraceability.setOliveHarvestId(farmerIdList);
+        oilTraceability.getFarmerId().get(0);
 
         //We don't have to save the entity into the database
         return oilTraceability;

@@ -2,6 +2,7 @@ package com.Oil4Med.Oil4Med.Controller;
 
 import com.Oil4Med.Oil4Med.DTO.FarmerDTO;
 import com.Oil4Med.Oil4Med.Model.*;
+import com.Oil4Med.Oil4Med.Repository.OilProductionBatchRepository;
 import com.Oil4Med.Oil4Med.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,19 +15,23 @@ import java.util.List;
 @RequestMapping("/api/oil4med/Farmer/")
 public class FarmerController {
     @Autowired
-    private FarmerService farmerService ;
+    FarmerService farmerService ;
     @Autowired
-    private OliveGroveService oliveGroveService ;
+    OliveGroveService oliveGroveService ;
     @Autowired
-    private MillAgreementService millAgreementService ;
+    MillAgreementService millAgreementService ;
     @Autowired
-    private OliveHarvestService oliveHarvestService ;
+    OliveHarvestService oliveHarvestService ;
     @Autowired
-    private  PurchaseHarvestService purchaseHarvestService ;
+     PurchaseHarvestService purchaseHarvestService ;
     @Autowired
-    private OliveSupplyForExtractionService oliveSupplyForExtractionService;
+    OliveSupplyForExtractionService oliveSupplyForExtractionService;
     @Autowired
-    private MillFactoryService millFactoryService;
+    MillFactoryService millFactoryService;
+    @Autowired
+    OilProductService oilProductService;
+    @Autowired
+    OilProductionBatchService oilProductionBatchService;
 
     // farmer CRUD
 //    @PostMapping("/createFarmer")
@@ -196,6 +201,40 @@ public class FarmerController {
     public void setIntentionToSellOil(OilProduct oilProduct)
     {
         farmerService.setIntentionToSellOil(oilProduct);
+    }
+
+    // OilProduct CRUD
+    @PostMapping("/createOilProduct")
+    public OilProduct createOilProduct(@RequestParam Long oilProductionBatchId,
+                                       @RequestBody OilProduct oilProduct){
+        OilProductionBatch oilProductionBatch = oilProductionBatchService.getOilProductionBatchById(oilProductionBatchId);
+        oilProduct.setOilProductionBatch(oilProductionBatch);
+        oilProduct.setPacked(false);
+        oilProduct.setStored(false);
+        if(oilProduct.getOilQuantity()>oilProductionBatch.getOilQuantity()){
+            throw new RuntimeException("More OilProduct Quantity than the one existant in OilProductionBatch");
+        }else{
+            oilProductionBatch.setOilQuantity(oilProductionBatch.getOilQuantity()-oilProduct.getOilQuantity());
+            oilProductionBatchService.updateOilProductionBatch(oilProductionBatchId,oilProductionBatch);
+        }
+        return oilProductService.addOilProduct(oilProduct);
+    }
+    @GetMapping("/getOilProductById")
+    public OilProduct getOilProductById(@RequestParam Long oilProductId) {
+        return oilProductService.getOilProductById(oilProductId);
+    }
+    @GetMapping("/getAllOilProducts")
+    public List<OilProduct> getAllOilProducts() {
+        List<OilProduct> oilProducts = oilProductService.getOilProduct();
+        return oilProducts;
+    }
+    @PutMapping("/updateOilProduct")
+    public void updateOilProduct(@RequestParam Long oilProductId,OilProduct oilProduct){
+        oilProductService.updateOilProduct(oilProductId,oilProduct);
+    }
+    @DeleteMapping("/deleteOilProduct")
+    public void deleteOilProduct(long oilProductId){
+        oilProductService.deleteOilProduct(oilProductService.getOilProductById(oilProductId));
     }
 
 
