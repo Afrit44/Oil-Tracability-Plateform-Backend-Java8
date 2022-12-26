@@ -9,7 +9,7 @@ public interface MillManagerService {
 
     List<MillManager> getMillManagers();
     MillManager getMillManagerById(Long id);
-    MillManager addMillManager(MillManager millManager);
+    MillManager addMillManager(MillManager millManager) throws Exception;
     void deleteMillManager(MillManager millManager);
     void updateMillManager(Long millManagerId, MillManager millManager);
 }

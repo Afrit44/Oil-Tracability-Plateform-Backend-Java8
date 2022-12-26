@@ -1,5 +1,7 @@
 package com.Oil4Med.Oil4Med.Service.Impl;
 
+import com.Oil4Med.Oil4Med.DTO.AdminDTO;
+import com.Oil4Med.Oil4Med.DTO.MillManagerDTO;
 import com.Oil4Med.Oil4Med.Model.Admin;
 import com.Oil4Med.Oil4Med.Model.Farmer;
 import com.Oil4Med.Oil4Med.Model.MillFactory;
@@ -9,10 +11,13 @@ import com.Oil4Med.Oil4Med.Repository.MillFactoryRepository;
 import com.Oil4Med.Oil4Med.Repository.MillManagerRepository;
 import com.Oil4Med.Oil4Med.Service.MillManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MillManagerImpl implements MillManagerService {
@@ -20,9 +25,7 @@ public class MillManagerImpl implements MillManagerService {
     @Autowired
     MillManagerRepository millManagerRepository;
     @Autowired
-    AdminRepository adminRepository;
-    @Autowired
-    private MillFactoryRepository millFactoryRepository;
+    PasswordEncoder passwordEncoder;
 
     @Override
     public List<MillManager> getMillManagers() {
@@ -37,7 +40,21 @@ public class MillManagerImpl implements MillManagerService {
     }
 
     @Override
-    public MillManager addMillManager(MillManager millManager) {
+    public MillManager addMillManager(MillManager millManager) throws Exception {
+        if (millManager == null) {
+            throw new EntityNotFoundException("ID_IS_NULL");
+        }
+        //Check email is unique
+        List<String> listEmails = new ArrayList<>();
+        List<MillManagerDTO> millManagerDTOS = millManagerRepository.findAll().stream()
+                .map(MillManagerDTO::fromEntity).collect(Collectors.toList());
+        for (MillManagerDTO millManagerDTO : millManagerDTOS){
+            listEmails.add(millManagerDTO.getEmail());
+        }
+        if(listEmails.contains(millManager.getEmail())){
+            throw new Exception("Email already exists in DataBase");
+        }
+        millManager.setPassword(passwordEncoder.encode(millManager.getPassword()));
         return millManagerRepository.save(millManager);
     }
 

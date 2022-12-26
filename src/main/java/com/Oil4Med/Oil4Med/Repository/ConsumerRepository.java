@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ConsumerRepository extends JpaRepository<Consumer, Long> {
 
-    Consumer findConsumerByEmail(String email);
+    Consumer findByEmail(String email);
 }

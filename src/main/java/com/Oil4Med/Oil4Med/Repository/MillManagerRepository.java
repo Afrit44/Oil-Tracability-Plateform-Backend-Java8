@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MillManagerRepository extends JpaRepository<MillManager, Long> {
 
-    MillManager findMillManagerByEmail(String email);
+    MillManager findByEmail(String email);
 }

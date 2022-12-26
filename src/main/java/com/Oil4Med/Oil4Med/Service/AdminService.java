@@ -10,7 +10,7 @@ public interface AdminService {
 
     Admin getAdminById(Long id);
 
-    Admin addAdmin(Admin admin);
+    Admin addAdmin(Admin admin) throws Exception;
 
     void deleteAdmin(Admin admin);
 

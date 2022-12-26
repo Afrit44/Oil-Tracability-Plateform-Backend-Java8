@@ -1,5 +1,7 @@
 package com.Oil4Med.Oil4Med.Service.Impl;
 
+import com.Oil4Med.Oil4Med.DTO.AdminDTO;
+import com.Oil4Med.Oil4Med.DTO.FarmerDTO;
 import com.Oil4Med.Oil4Med.Model.*;
 import com.Oil4Med.Oil4Med.Repository.AdminRepository;
 import com.Oil4Med.Oil4Med.Repository.FarmerRepository;
@@ -9,10 +11,13 @@ import com.Oil4Med.Oil4Med.Service.OilProductService;
 import com.Oil4Med.Oil4Med.Service.OliveHarvestService;
 import com.Oil4Med.Oil4Med.Service.OliveSupplyForExtractionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FarmerImpl implements FarmerService {
@@ -28,7 +33,9 @@ public class FarmerImpl implements FarmerService {
     @Autowired
     AdminRepository adminRepository;
     @Autowired
-    private OliveHarvestRepository oliveHarvestRepository;
+    OliveHarvestRepository oliveHarvestRepository;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Override
     public List<Farmer> getFarmers() {
@@ -42,7 +49,21 @@ public class FarmerImpl implements FarmerService {
     }
 
     @Override
-    public Farmer addFarmer(Farmer farmer) {
+    public Farmer addFarmer(Farmer farmer) throws Exception {
+        if (farmer == null) {
+            throw new EntityNotFoundException("ID_IS_NULL");
+        }
+        //Check email is unique
+        List<String> listEmails = new ArrayList<>();
+        List<FarmerDTO> farmers = farmerRepository.findAll().stream()
+                .map(FarmerDTO::fromEntity).collect(Collectors.toList());
+        for (FarmerDTO farmerDTO : farmers){
+            listEmails.add(farmerDTO.getEmail());
+        }
+        if(listEmails.contains(farmer.getEmail())){
+            throw new Exception("Email already exists in DataBase");
+        }
+        farmer.setPassword(passwordEncoder.encode(farmer.getPassword()));
         return farmerRepository.save(farmer);
     }
 

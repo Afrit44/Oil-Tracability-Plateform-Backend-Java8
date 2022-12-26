@@ -1,5 +1,7 @@
 package com.Oil4Med.Oil4Med.Service.Impl;
 
+import com.Oil4Med.Oil4Med.DTO.AdminDTO;
+import com.Oil4Med.Oil4Med.DTO.ConsumerDTO;
 import com.Oil4Med.Oil4Med.Model.*;
 import com.Oil4Med.Oil4Med.Model.Enum.Buyer;
 import com.Oil4Med.Oil4Med.Model.Enum.Seller;
@@ -11,10 +13,13 @@ import com.Oil4Med.Oil4Med.Service.ConsumerService;
 import com.Oil4Med.Oil4Med.Service.OilProductService;
 import com.Oil4Med.Oil4Med.Service.PurchaseOilService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ConsumerImpl implements ConsumerService {
@@ -28,7 +33,7 @@ public class ConsumerImpl implements ConsumerService {
     @Autowired
     AdminRepository adminRepository;
     @Autowired
-    private OliveSupplyForExtractionRepository oliveSupplyForExtractionRepository;
+    PasswordEncoder passwordEncoder;
 
     @Override
     public List<Consumer> getConsumers() {
@@ -41,7 +46,21 @@ public class ConsumerImpl implements ConsumerService {
         return consumerRepository.findById(id).get();
     }
     @Override
-    public Consumer addConsumer(Consumer consumer) {
+    public Consumer addConsumer(Consumer consumer) throws Exception {
+        if (consumer == null) {
+            throw new EntityNotFoundException("ID_IS_NULL");
+        }
+        //Check email is unique
+        List<String> listEmails = new ArrayList<>();
+        List<ConsumerDTO> consumerDTOS = consumerRepository.findAll().stream()
+                .map(ConsumerDTO::fromEntity).collect(Collectors.toList());
+        for (ConsumerDTO consumerDTO : consumerDTOS){
+            listEmails.add(consumerDTO.getEmail());
+        }
+        if(listEmails.contains(consumer.getEmail())){
+            throw new Exception("Email already exists in DataBase");
+        }
+        consumer.setPassword(passwordEncoder.encode(consumer.getPassword()));
         return consumerRepository.save(consumer);
     }
     @Override

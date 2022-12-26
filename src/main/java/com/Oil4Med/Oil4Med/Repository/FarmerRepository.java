@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FarmerRepository extends JpaRepository<Farmer, Long> {
 
-    Farmer findFarmerByEmail(String email);
+    Farmer findByEmail(String email);
 }

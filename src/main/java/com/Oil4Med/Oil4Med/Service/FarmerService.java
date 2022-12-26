@@ -8,7 +8,7 @@ public interface FarmerService {
 
     List<Farmer> getFarmers();
     Farmer getFarmerById(Long id);
-    Farmer addFarmer(Farmer farmer);
+    Farmer addFarmer(Farmer farmer) throws Exception;
     void deleteFarmer(Farmer farmer);
     void updateFarmer(Long farmerId, Farmer newFarmer);
     OliveSupplyForExtraction transportHarvestToMill(Long harvestId, double weight);
