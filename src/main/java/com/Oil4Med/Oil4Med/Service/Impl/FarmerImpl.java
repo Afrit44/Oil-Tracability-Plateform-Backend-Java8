@@ -36,6 +36,12 @@ public class FarmerImpl implements FarmerService {
     OliveHarvestRepository oliveHarvestRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    AdminImpl adminImpl;
+    @Autowired
+    ConsumerImpl consumerImpl;
+    @Autowired
+    MillManagerImpl millManagerImpl;
 
     @Override
     public List<Farmer> getFarmers() {
@@ -54,19 +60,28 @@ public class FarmerImpl implements FarmerService {
             throw new EntityNotFoundException("ID_IS_NULL");
         }
         //Check email is unique
-        List<String> listEmails = new ArrayList<>();
-        List<FarmerDTO> farmers = farmerRepository.findAll().stream()
-                .map(FarmerDTO::fromEntity).collect(Collectors.toList());
-        for (FarmerDTO farmerDTO : farmers){
-            listEmails.add(farmerDTO.getEmail());
-        }
-        if(listEmails.contains(farmer.getEmail())){
+        if(adminImpl.checkEmailExistAsAdminEmail(farmer.getEmail())
+                || consumerImpl.checkEmailExistInConsumer(farmer.getEmail())
+                || checkEmailExistInFarmer(farmer.getEmail())
+                || millManagerImpl.checkEmailExitMillManager(farmer.getEmail())){
             throw new Exception("Email already exists in DataBase");
         }
         farmer.setPassword(passwordEncoder.encode(farmer.getPassword()));
         return farmerRepository.save(farmer);
     }
 
+    boolean checkEmailExistInFarmer(String email){
+        List<String> listEmails = new ArrayList<>();
+        List<FarmerDTO> farmers = farmerRepository.findAll().stream()
+                .map(FarmerDTO::fromEntity).collect(Collectors.toList());
+        for (FarmerDTO farmerDTO : farmers){
+            listEmails.add(farmerDTO.getEmail());
+        }
+        if(listEmails.contains(email)){
+            return true;
+        }
+        return false;
+    }
     @Override
     public void deleteFarmer(Farmer farmer) {
         deleteFarmerAdminRelation(farmer);

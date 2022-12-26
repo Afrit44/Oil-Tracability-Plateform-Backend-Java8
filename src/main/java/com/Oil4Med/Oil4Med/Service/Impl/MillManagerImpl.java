@@ -26,6 +26,12 @@ public class MillManagerImpl implements MillManagerService {
     MillManagerRepository millManagerRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    AdminImpl adminImpl;
+    @Autowired
+    FarmerImpl farmerImpl;
+    @Autowired
+    ConsumerImpl consumerImpl;
 
     @Override
     public List<MillManager> getMillManagers() {
@@ -45,19 +51,29 @@ public class MillManagerImpl implements MillManagerService {
             throw new EntityNotFoundException("ID_IS_NULL");
         }
         //Check email is unique
-        List<String> listEmails = new ArrayList<>();
-        List<MillManagerDTO> millManagerDTOS = millManagerRepository.findAll().stream()
-                .map(MillManagerDTO::fromEntity).collect(Collectors.toList());
-        for (MillManagerDTO millManagerDTO : millManagerDTOS){
-            listEmails.add(millManagerDTO.getEmail());
-        }
-        if(listEmails.contains(millManager.getEmail())){
+
+        if(consumerImpl.checkEmailExistInConsumer(millManager.getEmail()) ||
+                adminImpl.checkEmailExistAsAdminEmail(millManager.getEmail()) ||
+                farmerImpl.checkEmailExistInFarmer(millManager.getEmail()) ||
+                checkEmailExitMillManager(millManager.getEmail())){
             throw new Exception("Email already exists in DataBase");
         }
         millManager.setPassword(passwordEncoder.encode(millManager.getPassword()));
         return millManagerRepository.save(millManager);
     }
 
+    boolean checkEmailExitMillManager(String email){
+        List<String> listEmails = new ArrayList<>();
+        List<MillManagerDTO> millManagerDTOS = millManagerRepository.findAll().stream()
+                .map(MillManagerDTO::fromEntity).collect(Collectors.toList());
+        for (MillManagerDTO millManagerDTO : millManagerDTOS){
+            listEmails.add(millManagerDTO.getEmail());
+        }
+        if(listEmails.contains(email)){
+            return true;
+        }
+        return false;
+    }
     @Override
     public void deleteMillManager(MillManager millManager) {
         deleteMillManagerAdminRelation(millManager);

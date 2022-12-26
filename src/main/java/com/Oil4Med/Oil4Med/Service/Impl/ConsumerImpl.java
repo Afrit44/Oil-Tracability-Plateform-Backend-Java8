@@ -34,6 +34,12 @@ public class ConsumerImpl implements ConsumerService {
     AdminRepository adminRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    AdminImpl adminImpl;
+    @Autowired
+    FarmerImpl farmerImpl;
+    @Autowired
+    MillManagerImpl millManagerImpl;
 
     @Override
     public List<Consumer> getConsumers() {
@@ -51,17 +57,27 @@ public class ConsumerImpl implements ConsumerService {
             throw new EntityNotFoundException("ID_IS_NULL");
         }
         //Check email is unique
+        if(checkEmailExistInConsumer(consumer.getEmail()) ||
+            adminImpl.checkEmailExistAsAdminEmail(consumer.getEmail()) ||
+                farmerImpl.checkEmailExistInFarmer(consumer.getEmail()) ||
+                    millManagerImpl.checkEmailExitMillManager(consumer.getEmail())
+        ){
+            throw new Exception("Email already exists in DataBase");
+        }
+        consumer.setPassword(passwordEncoder.encode(consumer.getPassword()));
+        return consumerRepository.save(consumer);
+    }
+    boolean checkEmailExistInConsumer(String email){
         List<String> listEmails = new ArrayList<>();
         List<ConsumerDTO> consumerDTOS = consumerRepository.findAll().stream()
                 .map(ConsumerDTO::fromEntity).collect(Collectors.toList());
         for (ConsumerDTO consumerDTO : consumerDTOS){
             listEmails.add(consumerDTO.getEmail());
         }
-        if(listEmails.contains(consumer.getEmail())){
-            throw new Exception("Email already exists in DataBase");
+        if(listEmails.contains(email)){
+            return true;
         }
-        consumer.setPassword(passwordEncoder.encode(consumer.getPassword()));
-        return consumerRepository.save(consumer);
+        return false;
     }
     @Override
     public void deleteConsumer(Consumer consumer) {

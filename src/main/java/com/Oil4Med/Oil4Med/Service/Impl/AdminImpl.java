@@ -20,6 +20,12 @@ public class AdminImpl implements AdminService {
     AdminRepository adminRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    ConsumerImpl consumerImpl;
+    @Autowired
+    FarmerImpl farmerImpl;
+    @Autowired
+    MillManagerImpl millManagerImpl;
 
     @Override
     public List<Admin> getAdmins() {
@@ -39,16 +45,27 @@ public class AdminImpl implements AdminService {
             throw new EntityNotFoundException("ID_IS_NULL");
         }
         //Check email is unique
-        List<String> listEmails = new ArrayList<>();
-        List<AdminDTO> admins = adminRepository.findAll().stream().map(AdminDTO::fromEntity).collect(Collectors.toList());
-        for (AdminDTO adminDTO : admins){
-            listEmails.add(adminDTO.getEmail());
-        }
-        if(listEmails.contains(admin.getEmail())){
+        if(checkEmailExistAsAdminEmail(admin.getEmail())
+            || consumerImpl.checkEmailExistInConsumer(admin.getEmail())
+            || farmerImpl.checkEmailExistInFarmer(admin.getEmail())
+                || millManagerImpl.checkEmailExitMillManager(admin.getEmail())){
             throw new Exception("Email already exists in DataBase");
         }
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         return adminRepository.save(admin);
+    }
+    Boolean checkEmailExistAsAdminEmail (String email){
+        List<String> listEmails = new ArrayList<>();
+        List<AdminDTO> admins = adminRepository.findAll().stream()
+                .map(AdminDTO::fromEntity).collect(Collectors.toList());
+
+        for (AdminDTO adminDTO : admins){
+            listEmails.add(adminDTO.getEmail());
+        }
+        if(listEmails.contains(email)){
+            return true;
+        }
+        return false;
     }
 
     @Override
