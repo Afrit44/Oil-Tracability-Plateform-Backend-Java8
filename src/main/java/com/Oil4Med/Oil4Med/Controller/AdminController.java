@@ -6,6 +6,7 @@ import com.Oil4Med.Oil4Med.DTO.FarmerDTO;
 import com.Oil4Med.Oil4Med.DTO.MillFactoryDTO;
 import com.Oil4Med.Oil4Med.Model.*;
 import com.Oil4Med.Oil4Med.Model.Types.OilTraceability;
+import com.Oil4Med.Oil4Med.Repository.AdminRepository;
 import com.Oil4Med.Oil4Med.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,8 @@ public class AdminController {
     private MillFactoryService millFactoryService;
     @Autowired
     private MillManagerService millManagerService ;
+    @Autowired
+    private AdminRepository adminRepository;
 
     //CRUD Admin
     @PostMapping("/createAdmin")
@@ -174,7 +177,16 @@ public class AdminController {
     }
     @DeleteMapping("/deleteMillManager")
     public void deleteMillManager(long managerId){
-
+        MillManager millManager = millManagerService.getMillManagerById(managerId);
+        Admin admin = millManager.getAdmin();
+//        MillFactory millFactory = millManager.getMillFactory();
+        millManager.setAdmin(null);
+//        millManager.setMillFactory(null);
+        admin.getMillManagerList().remove(millManager);
+        admin.setMillManagerList(admin.getMillManagerList());
+//        millFactory.setMillManager(null);
+//        millFactoryRepository.save(millFactory);
+        adminRepository.save(admin);
         millManagerService.deleteMillManager(millManagerService.getMillManagerById(managerId));
     }
 

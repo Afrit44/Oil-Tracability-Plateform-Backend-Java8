@@ -1,4 +1,4 @@
-package com.example.crmbackend.DTO.auth;
+package com.Oil4Med.Oil4Med.DTO.auth;
 
 import lombok.Builder;
 import lombok.Data;

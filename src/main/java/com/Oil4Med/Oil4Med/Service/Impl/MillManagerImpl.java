@@ -50,15 +50,6 @@ public class MillManagerImpl implements MillManagerService {
     //We have to delete the foreign key in admin_Farmers table in order to fully delete the Farmer user otherwise
     //it raise ERROR : update or delete on table "farmer" violates foreign key constraint on table "admin_farmers"
     private void deleteMillManagerAdminRelation(MillManager millManager) {
-        Admin admin = millManager.getAdmin();
-//        MillFactory millFactory = millManager.getMillFactory();
-        millManager.setAdmin(null);
-//        millManager.setMillFactory(null);
-        admin.getMillManagerList().remove(millManager);
-        admin.setMillManagerList(admin.getMillManagerList());
-//        millFactory.setMillManager(null);
-//        millFactoryRepository.save(millFactory);
-        adminRepository.save(admin);
         millManagerRepository.save(millManager);
     }
     @Override

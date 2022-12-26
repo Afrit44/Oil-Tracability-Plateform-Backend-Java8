@@ -6,6 +6,7 @@ import com.Oil4Med.Oil4Med.Model.Enum.Seller;
 import com.Oil4Med.Oil4Med.Model.Types.OilTraceability;
 import com.Oil4Med.Oil4Med.Repository.AdminRepository;
 import com.Oil4Med.Oil4Med.Repository.ConsumerRepository;
+import com.Oil4Med.Oil4Med.Repository.OliveSupplyForExtractionRepository;
 import com.Oil4Med.Oil4Med.Service.ConsumerService;
 import com.Oil4Med.Oil4Med.Service.OilProductService;
 import com.Oil4Med.Oil4Med.Service.PurchaseOilService;
@@ -26,30 +27,29 @@ public class ConsumerImpl implements ConsumerService {
     OilProductService oilProductService;
     @Autowired
     AdminRepository adminRepository;
+    @Autowired
+    private OliveSupplyForExtractionRepository oliveSupplyForExtractionRepository;
+
     @Override
     public List<Consumer> getConsumers() {
         List<Consumer> consumers = new ArrayList<>();
         consumerRepository.findAll().forEach(consumers::add);
         return consumers;
     }
-
     @Override
     public Consumer getConsumersById(Long id) {
         return consumerRepository.findById(id).get();
     }
-
     @Override
     public Consumer addConsumer(Consumer consumer) {
         return consumerRepository.save(consumer);
     }
-
     @Override
     public void deleteConsumer(Consumer consumer) {
 
         deleteConsumerAdminRelation(consumer);
         consumerRepository.delete(consumer);
     }
-
     //We have to delete the foreign key in admin_Farmers table in order to fully delete the Farmer user otherwise
     //it raise ERROR : update or delete on table "farmer" violates foreign key constraint on table "admin_farmers"
     private void deleteConsumerAdminRelation(Consumer consumer) {
@@ -70,9 +70,9 @@ public class ConsumerImpl implements ConsumerService {
         consumer.setPassword(newConsumer.getPassword());
         consumerRepository.save(consumer);
     }
-
     @Override
-    public PurchaseOil purchaseOilFromFarmer(Consumer consumer, Farmer farmer, OilProduct oilProduct, double quantity, double price) {
+    public PurchaseOil purchaseOilFromFarmer(Consumer consumer, Farmer farmer, OilProduct oilProduct,
+                                             double quantity, double price) {
         //Subtract the quantity bought by the consumer from the farmer and update it in database
         oilProduct.setOilQuantity(oilProduct.getOilQuantity()-quantity);
         oilProductService.updateOilProduct(oilProduct.getOilProductId(),oilProduct);
@@ -88,9 +88,9 @@ public class ConsumerImpl implements ConsumerService {
         purchaseOil.setOilProduct(oilProduct);
         return purchaseOilService.addPurchaseOil(purchaseOil);
     }
-
     @Override
-    public PurchaseOil purchaseOilFromMill(MillFactory millFactory, OilProduct oilProduct, double quantity, double price, Consumer consumer) {
+    public PurchaseOil purchaseOilFromMill(MillFactory millFactory, OilProduct oilProduct, double quantity,
+                                           double price, Consumer consumer) {
         //Subtract the quantity bought by the consumer from the farmer and update it in database
         if (oilProduct.getOilQuantity()-quantity<0){
             //Quantity subtracted is more than the one already in hand.
@@ -110,59 +110,103 @@ public class ConsumerImpl implements ConsumerService {
         purchaseOil.setOilProduct(oilProduct);
         return purchaseOilService.addPurchaseOil(purchaseOil);
     }
-
     @Override
     public OilTraceability checkTraceability(OilProduct oilProduct) {
 
         OilTraceability oilTraceability = new OilTraceability();
 
-        //Setting oilProductId
+        setTraceabilityOilProduct( oilProduct,  oilTraceability);
+
+        checkSetPackaging(oilProduct,oilTraceability);
+
+        checkSetStocked(oilProduct, oilTraceability);
+
+        OilProductionBatch oilProductionBatch = setOilProductionBatchTraceability(oilProduct,oilTraceability);
+
+        Extraction extraction = setExtractionTraceability( oilProductionBatch,oilTraceability);
+
+        List<Machine> machineList = setMachineListTraceability(extraction,oilTraceability);
+
+        MillFactory millFactory= setMillFactoryTraceability(machineList,oilTraceability);
+
+        List<OliveSupplyForExtraction> oliveSupplyForExtractionList=setOliveSupplyTraceability(extraction,oilTraceability);
+
+        List<OliveHarvest> oliveHarvestList = setOliveHarvestTraceability(oliveSupplyForExtractionList, oilTraceability);
+
+        List<OliveGrove> oliveGroveList = setOliveGroveTraceability(oliveHarvestList, oilTraceability);
+
+        setFarmerTraceability(oliveGroveList,oilTraceability);
+
+        //We don't have to save the entity into the database
+        return oilTraceability;
+    }
+
+    //**THESE FUNCTIONS ARE MADE FOR THE CHECK TRACEABILITY FUNCTION ABOVE. NOT DECLARED IN THE SERVICE INTERFACE**
+    //**AFRIT IS KILLING IT OVER HERE**
+
+    //Setting oilProductId
+    void setTraceabilityOilProduct(OilProduct oilProduct, OilTraceability oilTraceability){
         oilTraceability.setOilProductId(oilProduct.getOilProductId());
-
-        //Checking if the Oil Has been packaged, If yes then we Set the packagingOperationId
-        if (oilProduct.isPacked()){
+    }
+    //Checking if the Oil Has been packaged, If yes then we Set the packagingOperationId
+    void checkSetPackaging (OilProduct oilProduct, OilTraceability oilTraceability){
+        if (oilProduct.isPacked()) {
             oilTraceability.setPackagingOperationId(oilProduct.getPackagingOperation().getPackagingId());
-        }else{
+        } else {
             oilTraceability.setStorageAreaId(null);
         }
-
-        //Checking if the Oil Has been stocked, If yes then we Set the StorageAreaId
-        if (oilProduct.isStored()){
+    }
+    //Checking if the Oil Has been stocked, If yes then we Set the StorageAreaId
+    void checkSetStocked (OilProduct oilProduct, OilTraceability oilTraceability) {
+        if (oilProduct.isStored()) {
             oilTraceability.setStorageAreaId(oilProduct.getStorageArea().getStorageAreaId());
-        }else{
+        } else {
             oilTraceability.setStorageAreaId(null);
         }
-
-        //Setting oilProductionBatchId
+    }
+    //Setting oilProductionBatchId
+    OilProductionBatch setOilProductionBatchTraceability(OilProduct oilProduct,OilTraceability oilTraceability){
         OilProductionBatch oilProductionBatch = oilProduct.getOilProductionBatch();
         oilTraceability.setOilProductionBatchId(oilProductionBatch.getProductionBatchId());
-
-        //Setting extractionId
+        return oilProductionBatch;
+    }
+    //Setting extractionId
+    Extraction setExtractionTraceability(OilProductionBatch oilProductionBatch, OilTraceability oilTraceability){
         Extraction extraction = oilProductionBatch.getExtraction();
         oilTraceability.setExtractionId(extraction.getExtractionId());
-
-        //Setting Machine List via link with extraction
+        return extraction;
+    }
+    //Setting Machine List via link with extraction
+    List<Machine> setMachineListTraceability(Extraction extraction, OilTraceability oilTraceability){
         List<Machine> machineList = extraction.getMachinesList();
         List<Long> machineListId = new ArrayList<>();
-        for (Machine machine : machineList){
+        for (Machine machine : machineList) {
             machineListId.add(machine.getMachineId());
         }
         oilTraceability.setMachineIdList(machineListId);
-
-        //Setting MillFactory
+        return machineList;
+    }
+    //Setting MillFactory
+    MillFactory setMillFactoryTraceability(List<Machine> machineList, OilTraceability oilTraceability){
         MillFactory millFactory = machineList.get(0).getMillFactory();
         oilTraceability.setMillFactoryId(millFactory.getMillId());
+        return millFactory;
+    }
 
-
-        //Setting OliveSupply
+    //Setting OliveSupply
+    List<OliveSupplyForExtraction> setOliveSupplyTraceability(Extraction extraction, OilTraceability oilTraceability) {
         List<OliveSupplyForExtraction> oliveSupplyForExtractionList = extraction.getOliveSupplyForExtractionList();
         List<Long> oSupplyFEIdList = new ArrayList<>();
-        for(OliveSupplyForExtraction oliveSupplyForExtraction : oliveSupplyForExtractionList){
+        for (OliveSupplyForExtraction oliveSupplyForExtraction : oliveSupplyForExtractionList) {
             oSupplyFEIdList.add(oliveSupplyForExtraction.getSupplyId());
         }
         oilTraceability.setOliveSupplyForExtractionIdList(oSupplyFEIdList);
+        return oliveSupplyForExtractionList;
+    }
+    //Setting oliveHarvest
+    List<OliveHarvest> setOliveHarvestTraceability(List<OliveSupplyForExtraction> oliveSupplyForExtractionList,
+                                                   OilTraceability oilTraceability){
 
-        //Setting oliveHarvest
         List<OliveHarvest> oliveHarvestList = new ArrayList<>();
         List<Long> oliveHarvestIdList = new ArrayList<>();
         for (OliveSupplyForExtraction oliveSupplyForExtraction : oliveSupplyForExtractionList){
@@ -170,27 +214,25 @@ public class ConsumerImpl implements ConsumerService {
             oliveHarvestIdList.add(oliveSupplyForExtraction.getOliveHarvest().getHarvestId());
         }
         oilTraceability.setOliveHarvestId(oliveHarvestIdList);
-
-        //Setting oliveGrove
+        return oliveHarvestList;
+    }
+    //Setting oliveGrove
+    List<OliveGrove> setOliveGroveTraceability(List<OliveHarvest> oliveHarvestList, OilTraceability oilTraceability){
         List<OliveGrove> oliveGroveList = new ArrayList<>();
         List<Long> oliveGroveIdList = new ArrayList<>();
-        for (OliveHarvest oliveHarvest : oliveHarvestList){
+        for (OliveHarvest oliveHarvest : oliveHarvestList) {
             oliveGroveList.add(oliveHarvest.getOliveGrove());
             oliveGroveIdList.add(oliveHarvest.getOliveGrove().getGroveId());
         }
-        oilTraceability.setOliveHarvestId(oliveGroveIdList);
-
-        //Setting Farmer
-        List<Long> farmerIdList = new ArrayList<>();
-        for (OliveGrove oliveGrove : oliveGroveList){
-            oliveHarvestIdList.add(oliveGrove.getFarmer().getFarmerId());
-        }
-        oilTraceability.setOliveHarvestId(farmerIdList);
-        oilTraceability.getFarmerId().get(0);
-
-        //We don't have to save the entity into the database
-        return oilTraceability;
+        oilTraceability.setOliveGroveId(oliveGroveIdList);
+        return oliveGroveList;
     }
-
-
+    //Setting Farmer
+    void setFarmerTraceability(List<OliveGrove> oliveGroveList,OilTraceability oilTraceability) {
+        List<Long> farmerIdList = new ArrayList<>();
+        for (OliveGrove oliveGrove : oliveGroveList) {
+            farmerIdList.add(oliveGrove.getFarmer().getFarmerId());
+        }
+        oilTraceability.setFarmerId(farmerIdList);
+    }
 }
